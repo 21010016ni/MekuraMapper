@@ -8,11 +8,15 @@
 #endif // USE_RESOURCE
 
 HWND common::hwnd;
-int common::width = 640;
-int common::height = 480;
+int common::width = 1024;
+int common::height = 600;
 int common::colorbit = 32;
 int common::fps = 60;
 bool common::windowmode = true;
+
+int common::fc[8] = {0x3b7960,0x5a79ba,0x9370db,0xc0c0c0,0xbee0ce,0xfef263,0xf8b862,0xe95464};
+int common::lc[2] = {0xc8c2be,0x302833};
+int common::bc = 0x0b0b0b;
 
 std::mt19937 common::engine(std::random_device{}());
 

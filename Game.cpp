@@ -31,10 +31,10 @@ void Game::preset()
 	graph[3] = LoadGraph("data/cloth.png");
 	testGraph = LoadGraph("cursor.png");
 
-	for (int i = 0; i < 3; ++i)
+	for(int i = 0; i < 3; ++i)
 	{
 		grid.iconset.icon.emplace_back();
-		for (int j = 0; j < 15; ++j)
+		for(int j = 0; j < 15; ++j)
 		{
 			grid.iconset.icon.back().emplace_back(i * 15 + j);
 		}
@@ -43,9 +43,31 @@ void Game::preset()
 
 Game::Message Game::update()
 {
-	if (Keyboard::push(VK_ESCAPE))
+	if(Keyboard::push(VK_ESCAPE))
 	{
 		return Message::quit;
+	}
+
+	if(Keyboard::push('C'))
+	{
+		int buf;
+		printf("%d面の色を入力 : ", grid.brushColor);
+		scanf_s("%x", &buf);
+		common::fc[grid.brushColor] = buf;
+	}
+	else if(Keyboard::push('T'))
+	{
+		int buf;
+		printf("有効線の色を入力 : ");
+		scanf_s("%x", &buf);
+		common::lc[0] = buf;
+	}
+	else if(Keyboard::push('F'))
+	{
+		int buf;
+		printf("無効線の色を入力 : ");
+		scanf_s("%x", &buf);
+		common::lc[1] = buf;
 	}
 
 	grid.controll();
@@ -56,26 +78,35 @@ Game::Message Game::update()
 
 void Game::draw()
 {
+	DrawBox(0, 0, common::width, common::height, common::bc, true);
 	grid.draw();
 	grid.iconset.draw();
 	//DrawGraph(Mouse::pos.x, Mouse::pos.y, testGraph, true);
-	switch (grid.tool)
+	switch(grid.tool)
 	{
 	case 0:
-		if (Mouse::b2())
+		if(Mouse::b2())
 			DrawGraph(Mouse::pos.x - 3, Mouse::pos.y - 3, graph[1], true);
 		else
 			DrawGraph(Mouse::pos.x, Mouse::pos.y, graph[0], true);
 		break;
 	case 1:
-		if (Mouse::b2())
-			DrawGraph(Mouse::pos.x, Mouse::pos.y, graph[3], true);
+		if(Mouse::b2())
+			DrawGraph(Mouse::pos.x - 11, Mouse::pos.y - 11, graph[3], true);
 		else
-			DrawGraph(Mouse::pos.x, Mouse::pos.y, graph[2], true);
+			DrawGraph(Mouse::pos.x - 3, Mouse::pos.y - 3, graph[2], true);
 		break;
 	case 2:
 		DrawBox(Mouse::pos.x - 7, Mouse::pos.y - 7, Mouse::pos.x + 7, Mouse::pos.y + 7, grid.hasIcon * 6324891, true);
 		break;
+	}
+	if(Mouse::b3())
+	{
+		for(int i = 0; i < 8; ++i)
+		{
+			float x = std::cos(common::pi * i / 4), y = std::sin(common::pi * i / 4);
+			DrawLine(grid.circle.x + x * grid.ColorchangeActivateLength, grid.circle.y + y * grid.ColorchangeActivateLength, grid.circle.x + x * grid.ColorchangeActivateLength * 3, grid.circle.y + y * grid.ColorchangeActivateLength * 3, 0xffffffff);
+		}
 	}
 
 	//Particle::draw();

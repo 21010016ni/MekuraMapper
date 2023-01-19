@@ -15,6 +15,10 @@ namespace common
 	extern int fps;
 	extern bool windowmode;
 
+	extern int fc[8];
+	extern int lc[2];
+	extern int bc;
+
 	extern std::mt19937 engine;
 
 	constexpr float pi = 3.14159265359f;

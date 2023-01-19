@@ -42,11 +42,11 @@ bool Grid::controll()
 					circle = log.pos - circle;
 					if (circle.length<float>() > ColorchangeActivateLength)
 					{
-						float buf = std::atan2(circle.y, circle.x);
+						float buf = std::atan2f(circle.y, circle.x);
 						if (buf < 0)
 							buf += common::pi * 2;
-						buf /= static_cast<char>(common::pi / 4);
-						brushColor = floor(buf);
+						buf /= common::pi / 4;
+						brushColor = static_cast<char>(floor(buf));
 					}
 				}
 			}
@@ -178,26 +178,23 @@ void Grid::draw()
 			int color = -1;
 			switch (grid[y][x].face)
 			{
-			case -1:color = 0xefcd9a; break;
-			case 0:color = 0xa8c97f; break;
-			case 1:color = 0x5a79ba; break;
-			case 2:color = 0x9370db; break;
-			case 3:color = 0xc0c0c0; break;
-			case 4:color = 0xbee0ce; break;
-			case 5:color = 0xfef263; break;
-			case 6:color = 0xf8b862; break;
-			case 7:color = 0xe95464; break;
+			//case -1:color = 0xefcd9a; break;
+			case 0:color = common::fc[0]; break;
+			case 1:color = common::fc[1]; break;
+			case 2:color = common::fc[2]; break;
+			case 3:color = common::fc[3]; break;
+			case 4:color = common::fc[4]; break;
+			case 5:color = common::fc[5]; break;
+			case 6:color = common::fc[6]; break;
+			case 7:color = common::fc[7]; break;
 			}
-			display.box(x * size.x, y * size.y, size.x, size.y, color, true);
-			//DrawBox(x * size.x - scrool.x, y * size.y - scrool.y, (x + 1) * size.x - scrool.x, (y + 1) * size.y - scrool.y, color, true);
-			display.line(x * size.x, y * size.y, (x + 1) * size.x, y * size.y, grid[y][x].up() ? 0x3f312b : 0xc3aa7e, grid[y][x].up() ? 2 : 1);
-			//DrawLine(x * size.x - scrool.x, y * size.y - scrool.y, (x + 1) * size.x - scrool.x, y * size.y - scrool.y, grid[y][x].up() ? 0x3f312b : 0xc3aa7e, grid[y][x].up() ? 2 : 1);
-			display.line(x * size.x, y * size.y, x * size.x, (y + 1) * size.y, grid[y][x].left() ? 0x3f312b : 0xc3aa7e, grid[y][x].left() ? 2 : 1);
-			//DrawLine(x * size.x - scrool.x, y * size.y - scrool.y, x * size.x - scrool.x, (y + 1) * size.y - scrool.y, grid[y][x].left() ? 0x3f312b : 0xc3aa7e, grid[y][x].left() ? 2 : 1);
+			if(color != -1)
+				display.box(x * size.x, y * size.y, size.x, size.y, color, true);
+			display.line(x * size.x, y * size.y, (x + 1) * size.x, y * size.y, grid[y][x].up() ? common::lc[0] : common::lc[1], grid[y][x].up() ? 2 : 1);
+			display.line(x * size.x, y * size.y, x * size.x, (y + 1) * size.y, grid[y][x].left() ? common::lc[0] : common::lc[1], grid[y][x].left() ? 2 : 1);
 			if (grid[y][x].icon != -1)
 			{
-				display.box(x * size.x + 3, y * size.y + 3, size.x - 2, size.y - 2, grid[y][x].icon * 6324891, true);
-				//DrawBox(x * size.x - scrool.x + 3, y * size.y - scrool.y + 3, (x + 1) * size.x - scrool.x - 2, (y + 1) * size.y - scrool.y - 2, grid[y][x].icon * 6324891, true);
+				display.box(x * size.x + 3, y * size.y + 3, size.x - 5, size.y - 5, grid[y][x].icon * 6324891, true);
 			}
 		}
 	}

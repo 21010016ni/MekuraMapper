@@ -85,7 +85,7 @@ public:
 		Point<int> pos;
 		bool type;
 
-		Log() :button(0), pos(-1, -1), type(-1) {}
+		Log() :button(0), pos(-1, -1), type(false) {}
 
 		bool left()const noexcept { return button & MOUSE_INPUT_LEFT; }
 		bool right()const noexcept { return button & MOUSE_INPUT_RIGHT; }
