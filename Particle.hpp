@@ -38,8 +38,10 @@ class Particle
 	static inline std::list<std::unique_ptr<Emitter>> emitter;
 
 public:
+#pragma warning(disable:4244)
 	template<class T, class... Args> static void emit(Args... args) { snowflake.emplace_back(new T(args...)); }
 	template<class T, class... Args> static void set(Args... args) { emitter.emplace_back(new T(args...)); }
+#pragma warning(default:4244)
 	static void update();
 	static void draw();
 };

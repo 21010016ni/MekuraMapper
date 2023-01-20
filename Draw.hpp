@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
+#include <bitset>
 #include "Point.hpp"
-#include "BitFlag.hpp"
 
 namespace ref
 {
-	constexpr BitFlag
+	constexpr std::bitset<8>
 		top(0x00),
 		bottom(0x01),
 		middle(0x03),
@@ -78,7 +78,7 @@ class Draw
 		const float y(int lv)const { return (lv >= lvmn && lv <= lvmx) ? v.y : 0; }
 	};
 
-	static const Point<int> GetRef(BitFlag ref, int w, int h);
+	static const Point<int> GetRef(std::bitset<8> ref, int w, int h);
 
 public:
 	static inline int font = -1;
@@ -123,8 +123,8 @@ public:
 	void sprite(int dstX, int dstY, int srcX, int srcY, int w, int h, int graph, bool alpha, bool reverseX = false, bool reverseY = false)const;
 	void sprite(const Point<int>& dst, const Point<int>& src, const Point<int>& siz, int graph, bool alpha, bool reverseX = false, bool reverseY = false)const;
 
-	int string(int x, int y, const std::u8string& v, unsigned int color, BitFlag ref = 0, unsigned int edge = 0u)const;
-	int string(const Point<int>& dst, const std::u8string& v, unsigned int color, BitFlag ref = 0, unsigned int edge = 0u)const;
+	int string(int x, int y, const std::u8string& v, unsigned int color, std::bitset<8> ref = 0, unsigned int edge = 0u)const;
+	int string(const Point<int>& dst, const std::u8string& v, unsigned int color, std::bitset<8> ref = 0, unsigned int edge = 0u)const;
 	static int getStringWidth(const std::u8string& v, bool vertical = false);
 };
 

@@ -59,9 +59,9 @@ void Draw::Shake::update()
 }
 
 
-const Point<int> Draw::GetRef(BitFlag ref, int w, int h)
+const Point<int> Draw::GetRef(std::bitset<8> ref, int w, int h)
 {
-	return Point<int>(ref(0) ? h / (ref(1) ? 2 : 1) : 0, ref(2) ? w / (ref(3) ? 2 : 1) : 0);
+	return Point<int>(ref[0] ? h / (ref[1] ? 2 : 1) : 0, ref[2] ? w / (ref[3] ? 2 : 1) : 0);
 }
 
 void Draw::blend()
@@ -184,7 +184,7 @@ void Draw::sprite(const Point<int>& dst, const Point<int>& src, const Point<int>
 	DrawRectGraph(static_cast<int>(shake.x(lv)) + pos.x + dst.x, static_cast<int>(shake.y(lv)) + pos.y + dst.y, src.x, src.y, siz.x, siz.y, graph, alpha, reverseX, reverseY);
 }
 
-int Draw::string(int x, int y, const std::u8string& v, unsigned int color, BitFlag ref, unsigned int edge)const
+int Draw::string(int x, int y, const std::u8string& v, unsigned int color, std::bitset<8> ref, unsigned int edge)const
 {
 	int w = (font != -1) ? GetDrawStringWidthToHandle(ext::to<TCHAR>(v), static_cast<int>(v.size()), font) : GetDrawStringWidth(ext::to<TCHAR>(v), static_cast<int>(v.size()));
 	auto r = GetRef(ref, w, (font != -1) ? GetFontSizeToHandle(font) : GetFontSize());
@@ -195,7 +195,7 @@ int Draw::string(int x, int y, const std::u8string& v, unsigned int color, BitFl
 	return w;
 }
 
-int Draw::string(const Point<int>& dst, const std::u8string& v, unsigned int color, BitFlag ref, unsigned int edge)const
+int Draw::string(const Point<int>& dst, const std::u8string& v, unsigned int color, std::bitset<8> ref, unsigned int edge)const
 {
 	int w = (font != -1) ? GetDrawStringWidthToHandle(ext::to<TCHAR>(v), static_cast<int>(v.size()), font) : GetDrawStringWidth(ext::to<TCHAR>(v), static_cast<int>(v.size()));
 	auto r = GetRef(ref, w, (font != -1) ? GetFontSizeToHandle(font) : GetFontSize());

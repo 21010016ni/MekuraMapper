@@ -18,52 +18,53 @@
 //	shape.emplace_back(new Line(blendmode::add, 0xff00ffu, 2, [](int t) { return Point<float>(sin(t * 0.0625f + common::pi * 5 / 3)		* 32,	cos(t * 0.0625f + common::pi * 5 / 3)		* 32); }, [](int t) { return Point<float>(sin(t * 0.0625f)							* 32, cos(t * 0.0625f)							* 32); }, [](int t) { return __min(256 - t * 8, 196); }));
 //}
 
-enum command
+namespace command
 {
-	// 変数バッファ
-	v0 = 1,
-	v1 = 3,
-	v2 = 5,
-	v3 = 7,
-	v4 = 9,
-	v5 = 11,
-	v6 = 13,
-	v7 = 15,
+	constexpr int32_t
+		// 変数バッファ
+		v0 = 1,
+		v1 = 3,
+		v2 = 5,
+		v3 = 7,
+		v4 = 9,
+		v5 = 11,
+		v6 = 13,
+		v7 = 15,
 
-	buf = 16,
+		buf = 16,
 
-	// 参照変数
-	t = 17,
-	width = 19,
-	height = 21,
+		// 参照変数
+		t = 17,
+		width = 19,
+		height = 21,
 
-	var = 32,
+		var = 32,
 
-	// 定数
-	pi = 33,
+		// 定数
+		pi = 33,
 
-	num = 64,
+		num = 64,
 
-	// 演算子
-	equal = 65,
-	ADD = 67,
-	SUB = 69,
-	MUL = 71,
-	DIV = 73,
+		// 演算子
+		equal = 65,
+		ADD = 67,
+		SUB = 69,
+		MUL = 71,
+		DIV = 73,
 
-	// 二項関数
-	SIN = 129,
-	COS = 131,
-	TAN = 133,
+		// 二項関数
+		SIN = 129,
+		COS = 131,
+		TAN = 133,
 
-	dfunc = 256,
+		dfunc = 256,
 
-	// 単項関数
+		// 単項関数
 
-	sfunc = 512,
+		sfunc = 512,
 
-	// 特殊フロー
-	end = 513,
+		// 特殊フロー
+		end = 513;
 };
 
 int Effect::load(const char* FileName)
@@ -271,7 +272,7 @@ void Effect::emit(float x, float y, int handle)
 	Particle::emit<Instance,float,float,const Template&>(x, y, i->second);
 }
 
-Effect::Instance::Instance(float x, float y, const Template& temp)
+Effect::Instance::Instance(int x, int y, const Template& temp)
 	:Snowflake(temp.duration), d(x, y, 8), t(0)
 {
 	for(const auto& i : temp.shape)
@@ -302,16 +303,16 @@ void Effect::Instance::update()
 					switch(c)
 					{
 					case command::t:
-						*value.top() = t;
+						*value.top() = static_cast<float>(t);
 						break;
 					case command::width:
-						*value.top() = common::width;
+						*value.top() = static_cast<float>(common::width);
 						break;
 					case command::height:
-						*value.top() = common::height;
+						*value.top() = static_cast<float>(common::height);
 						break;
 					case command::pi:
-						*value.top() = common::pi;
+						*value.top() = static_cast<float>(common::pi);
 						break;
 					}
 					stack.emplace(value.top().get());
@@ -355,13 +356,11 @@ void Effect::Instance::update()
 				}
 				else if(c < command::sfunc)
 				{
-					// 単項演算子・関数
-					auto v = stack.top();
-					switch(c)
-					{
-					default:
-						break;
-					}
+					//// 単項演算子・関数
+					//auto v = stack.top();
+					//switch(c)
+					//{
+					//}
 				}
 				else
 				{
@@ -396,21 +395,21 @@ void Effect::Instance::draw()const
 		switch(i.type)
 		{
 		case 0:	// Pixel
-			d.blend(i.mode, i.buffer[0]);
-			d.pixel(i.buffer[2], i.buffer[3], i.buffer[1]);
+			d.blend(i.mode, static_cast<unsigned char>(i.buffer[0]));
+			d.pixel(static_cast<int>(i.buffer[2]), static_cast<int>(i.buffer[3]), static_cast<unsigned int>(i.buffer[1]));
 			break;
 		case 1:	// Circle
-			d.blend(i.mode, i.buffer[0]);
-			d.circleAA(i.buffer[2], i.buffer[3], i.buffer[4], i.buffer[6], i.buffer[1], i.buffer[5], i.buffer[7]);
+			d.blend(i.mode, static_cast<unsigned char>(i.buffer[0]));
+			d.circleAA(i.buffer[2], i.buffer[3], i.buffer[4], static_cast<int>(i.buffer[6]), static_cast<unsigned int>(i.buffer[1]), static_cast<bool>(i.buffer[5]), i.buffer[7]);
 			break;
 		case 2:	// Polygon
-			d.blend(i.mode, i.buffer[0]);
-			for(int n = 0, num = i.buffer[6]; n < num; ++n)
-				d.lineAA(i.buffer[2] + std::cos(i.buffer[5] + common::pi2 * n / num) * i.buffer[4], i.buffer[3] + std::sin(i.buffer[5] + common::pi2 * n / num) * i.buffer[4], i.buffer[2] + std::cos(i.buffer[5] + common::pi2 * (n + 1) / num) * i.buffer[4], i.buffer[3] + std::sin(i.buffer[5] + common::pi2 * (n + 1) / num) * i.buffer[4], i.buffer[1], i.buffer[7]);
+			d.blend(i.mode, static_cast<unsigned char>(i.buffer[0]));
+			for(int n = 0, num = static_cast<int>(i.buffer[6]); n < num; ++n)
+				d.lineAA(i.buffer[2] + std::cos(i.buffer[5] + common::pi2 * n / num) * i.buffer[4], i.buffer[3] + std::sin(i.buffer[5] + common::pi2 * n / num) * i.buffer[4], i.buffer[2] + std::cos(i.buffer[5] + common::pi2 * (n + 1) / num) * i.buffer[4], i.buffer[3] + std::sin(i.buffer[5] + common::pi2 * (n + 1) / num) * i.buffer[4], static_cast<unsigned int>(i.buffer[1]), i.buffer[7]);
 			break;
 		case 3:	// Line
-			d.blend(i.mode, i.buffer[0]);
-			d.lineAA(i.buffer[2], i.buffer[3], i.buffer[4], i.buffer[5], i.buffer[1], i.buffer[7]);
+			d.blend(i.mode, static_cast<unsigned char>(i.buffer[0]));
+			d.lineAA(i.buffer[2], i.buffer[3], i.buffer[4], i.buffer[5], static_cast<unsigned int>(i.buffer[1]), i.buffer[7]);
 			break;
 		}
 	}

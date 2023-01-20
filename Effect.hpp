@@ -29,15 +29,15 @@ class Effect
 			{
 				for(int i = 0; i < 8; ++i)
 					preset[i] = 0;
-				preset[5] = fill;
-				preset[6] = num;
+				preset[5] = static_cast<float>(fill);
+				preset[6] = static_cast<float>(num);
 			}
 			// ëΩäpå`
 			Shape(char type, unsigned char mode, unsigned short start, int num) :type(type), mode(mode), start(start)
 			{
 				for(int i = 0; i < 8; ++i)
 					preset[i] = 0;
-				preset[6] = num;
+				preset[6] = static_cast<float>(num);
 			}
 		};
 
@@ -76,7 +76,7 @@ public:
 		std::vector<Shape> shape;
 
 	public:
-		Instance(float x, float y, const Template& temp);
+		Instance(int x, int y, const Template& temp);
 		void update()override;
 		void draw()const override;
 	};

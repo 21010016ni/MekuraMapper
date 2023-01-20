@@ -157,7 +157,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinIO.hpp" />
-    <ClInclude Include="BitFlag.hpp" />
     <ClInclude Include="common.hpp" />
     <ClInclude Include="convert_string.hpp" />
     <ClInclude Include="Draw.hpp" />

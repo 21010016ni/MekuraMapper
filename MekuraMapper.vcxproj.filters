@@ -68,9 +68,6 @@
     <ClInclude Include="BinIO.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BitFlag.hpp">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="common.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
