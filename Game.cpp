@@ -8,7 +8,7 @@
 #include "Grid.hpp"
 
 Draw Game::display(0, 0, 0);
-Grid<32,24> grid(24, 24);
+Grid<35, 19> grid(24, 24, 204, 92);
 char tool = 0;
 char toolmode;
 Point<int> click;

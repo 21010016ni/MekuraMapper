@@ -9,7 +9,7 @@
 
 HWND common::hwnd;
 int common::width = 1024;
-int common::height = 600;
+int common::height = 768;
 int common::colorbit = 32;
 int common::fps = 60;
 bool common::windowmode = true;
@@ -35,7 +35,7 @@ void MenuItemSelectCallBack(const TCHAR* ItemName, int ItemID)
 int main() { return WinMain(GetModuleHandle(0), NULL, NULL, _Notnull_ SW_SHOWDEFAULT); }
 #endif // USE_CONSOLE
 
-int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	// èâä˙âª
 	int count = 0;	// FPSí≤êÆóp

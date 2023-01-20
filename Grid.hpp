@@ -8,7 +8,7 @@
 #include "Input.hpp"
 #include "common.hpp"
 
-template<size_t x,size_t y> class Grid
+template<size_t sizeX,size_t sizeY> class Grid
 {
 	struct Tile
 	{
@@ -31,17 +31,17 @@ template<size_t x,size_t y> class Grid
 		bool left() { return edge[1]; }
 	};
 
-	template <size_t x,size_t y>struct GridData
+	template <size_t _x,size_t _y>struct GridData
 	{
-		std::array<std::array<Tile, x>, y> data;
-		std::array<Tile, x>& operator[](size_t i) { return data[i]; }
+		std::array<std::array<Tile, _x>, _y> data;
+		std::array<Tile, _x>& operator[](size_t i) { return data[i]; }
 		Tile& operator[](const Point<int>& i) { return data[i.y][i.x]; }
 	};
 
 public:
 	Draw display;
 
-	GridData<x, y> grid;
+	GridData<sizeX, sizeY> grid;
 	Point<int> size;
 	IconSet iconset;
 
@@ -227,9 +227,9 @@ public:
 
 	void draw()
 	{
-		for (int y = 0; y < y; ++y)
+		for (int y = 0; y < sizeY; ++y)
 		{
-			for (int x = 0; x < x; ++x)
+			for (int x = 0; x < sizeX; ++x)
 			{
 				int color = -1;
 				switch (grid[y][x].face)
@@ -254,6 +254,7 @@ public:
 				}
 			}
 		}
+		display.circle(12 * size.x + size.x / 2, 7 * size.y + size.y / 2, size.x / 2, 0xffffff, true);
 	}
 };
 
