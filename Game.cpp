@@ -7,6 +7,8 @@
 
 #include "Grid.hpp"
 
+#include "common_functions.hpp"
+
 Draw Game::display(0, 0, 0);
 Grid<35, 19> grid(24, 24, 204, 92);
 char tool = 0;
@@ -15,6 +17,11 @@ Point<int> click;
 
 int graph[4];
 int testGraph;
+
+int se;
+int pan;
+int vol;
+Point<float> distance;
 
 // âîïM/è¡ÇµÉSÉÄ
 // äeêFÉuÉâÉV/éGã–
@@ -30,6 +37,7 @@ void Game::preset()
 	graph[2] = LoadGraph("data/brush.png");
 	graph[3] = LoadGraph("data/cloth.png");
 	testGraph = LoadGraph("cursor.png");
+	se = LoadSoundMem("data/Footstep-low.wav");
 
 	for(int i = 0; i < 3; ++i)
 	{
@@ -69,8 +77,55 @@ Game::Message Game::update()
 		scanf_s("%x", &buf);
 		common::lc[1] = buf;
 	}
+	else if (Keyboard::push(VK_NUMPAD0))
+	{
+		pan = distance.normalize().x * 255;
+		float l = distance.length<float>();
+		vol = (1.0f - ext::sum<float>(1, l, [](size_t i) {return i * 0.125f; })) * 255 - l * 25.5f;
+		ChangeNextPlayPanSoundMem(pan, se);
+		ChangeNextPlayVolumeSoundMem(vol, se);
+		PlaySoundMem(se, DX_PLAYTYPE_BACK);
+	}
+	else if (Keyboard::push(VK_NUMPAD1))
+	{
+		distance = Point<float>(-1, -1);
+	}
+	else if (Keyboard::push(VK_NUMPAD2))
+	{
+		distance = Point<float>(-1, 0);
+	}
+	else if (Keyboard::push(VK_NUMPAD3))
+	{
+		distance = Point<float>(-1, 1);
+	}
+	else if (Keyboard::push(VK_NUMPAD4))
+	{
+		distance = Point<float>(-2, -1);
+	}
+	else if (Keyboard::push(VK_NUMPAD5))
+	{
+		distance = Point<float>(-2, 0);
+	}
+	else if (Keyboard::push(VK_NUMPAD6))
+	{
+		distance = Point<float>(-2, 1);
+	}
+	else if (Keyboard::push(VK_NUMPAD7))
+	{
+		distance = Point<float>(-3, -1);
+	}
+	else if (Keyboard::push(VK_NUMPAD8))
+	{
+		distance = Point<float>(-3, 0);
+	}
+	else if (Keyboard::push(VK_NUMPAD9))
+	{
+		distance = Point<float>(-3, 1);
+	}
 
 	grid.controll();
+
+	
 
 	//Particle::update();
 	return Message::none;

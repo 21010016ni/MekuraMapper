@@ -32,6 +32,7 @@ public:
 	constexpr Point operator()(const T& t)const noexcept { return Point(t / x, t % x); }
 
 	constexpr Point approximate(const Point& siz, int level)const { return Point(y / (siz.y / level), x / (siz.x / level)); }
+	constexpr Point normalize()const { return *this / length<T>(); }
 
 	template<typename U> constexpr U length()const { return std::sqrt(y * y + x * x); }
 	template<typename U> constexpr U distance(const Point& t)const { return std::sqrt((y - t.y) * (y - t.y) + (x - t.x) * (x - t.x)); }

@@ -153,10 +153,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleDust.cpp" />
+    <ClCompile Include="SoundEffect.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinIO.hpp" />
+    <ClInclude Include="common_functions.hpp" />
     <ClInclude Include="common.hpp" />
     <ClInclude Include="convert_string.hpp" />
     <ClInclude Include="Draw.hpp" />
@@ -169,6 +171,7 @@
     <ClInclude Include="Particle.hpp" />
     <ClInclude Include="ParticleDust.hpp" />
     <ClInclude Include="Point.hpp" />
+    <ClInclude Include="SoundEffect.hpp" />
     <ClInclude Include="UI.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
