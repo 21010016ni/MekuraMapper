@@ -77,55 +77,8 @@ Game::Message Game::update()
 		scanf_s("%x", &buf);
 		common::lc[1] = buf;
 	}
-	else if (Keyboard::push(VK_NUMPAD0))
-	{
-		pan = distance.normalize().x * 255;
-		float l = distance.length<float>();
-		vol = (1.0f - ext::sum<float>(1, l, [](size_t i) {return i * 0.125f; })) * 255 - l * 25.5f;
-		ChangeNextPlayPanSoundMem(pan, se);
-		ChangeNextPlayVolumeSoundMem(vol, se);
-		PlaySoundMem(se, DX_PLAYTYPE_BACK);
-	}
-	else if (Keyboard::push(VK_NUMPAD1))
-	{
-		distance = Point<float>(-1, -1);
-	}
-	else if (Keyboard::push(VK_NUMPAD2))
-	{
-		distance = Point<float>(-1, 0);
-	}
-	else if (Keyboard::push(VK_NUMPAD3))
-	{
-		distance = Point<float>(-1, 1);
-	}
-	else if (Keyboard::push(VK_NUMPAD4))
-	{
-		distance = Point<float>(-2, -1);
-	}
-	else if (Keyboard::push(VK_NUMPAD5))
-	{
-		distance = Point<float>(-2, 0);
-	}
-	else if (Keyboard::push(VK_NUMPAD6))
-	{
-		distance = Point<float>(-2, 1);
-	}
-	else if (Keyboard::push(VK_NUMPAD7))
-	{
-		distance = Point<float>(-3, -1);
-	}
-	else if (Keyboard::push(VK_NUMPAD8))
-	{
-		distance = Point<float>(-3, 0);
-	}
-	else if (Keyboard::push(VK_NUMPAD9))
-	{
-		distance = Point<float>(-3, 1);
-	}
 
 	grid.controll();
-
-	
 
 	//Particle::update();
 	return Message::none;

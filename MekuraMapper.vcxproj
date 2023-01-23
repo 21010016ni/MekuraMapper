@@ -143,9 +143,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="convert_string.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="Field.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Handle.cpp" />
@@ -153,7 +153,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleDust.cpp" />
-    <ClCompile Include="SoundEffect.cpp" />
+    <ClCompile Include="SoundList.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +163,7 @@
     <ClInclude Include="convert_string.hpp" />
     <ClInclude Include="Draw.hpp" />
     <ClInclude Include="Effect.hpp" />
+    <ClInclude Include="Field.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Grid.hpp" />
     <ClInclude Include="Handle.hpp" />
@@ -171,7 +172,7 @@
     <ClInclude Include="Particle.hpp" />
     <ClInclude Include="ParticleDust.hpp" />
     <ClInclude Include="Point.hpp" />
-    <ClInclude Include="SoundEffect.hpp" />
+    <ClInclude Include="SoundList.hpp" />
     <ClInclude Include="UI.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

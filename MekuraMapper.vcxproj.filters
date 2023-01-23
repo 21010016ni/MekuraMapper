@@ -18,9 +18,6 @@
     <ClCompile Include="IconSet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="convert_string.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Draw.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -48,7 +45,10 @@
     <ClCompile Include="Grid.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SoundEffect.cpp">
+    <ClCompile Include="Field.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundList.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,7 +98,10 @@
     <ClInclude Include="common_functions.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SoundEffect.hpp">
+    <ClInclude Include="Field.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundList.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
