@@ -33,7 +33,8 @@
 #include <array>
 #include <memory>
 #include <list>
-#include "Point.hpp"
+#include "Grid.hpp"
+#include "Game.hpp"
 
 class Object
 {
@@ -42,12 +43,39 @@ class Object
 
 class Mob
 {
+public:
 	Point<int> pos;
+	char rot;	// ^0,>1,v2,<3 
+	virtual void routine() = 0;
 };
+
 
 class Player :public Mob
 {
-
+	void routine()override
+	{
+		switch (Game::pop())
+		{
+		case 0:	// ¶U‚èŒü‚«
+			rot -= 1;
+			if (rot < 0)
+				rot += 4;
+			break;
+		case 1:	// ‘Oi
+			(rot % 2 == 0) ? pos.y : pos.x += (rot / 2 == 0) ? 1 : -1;
+			break;
+		case 2:	// ‰EU‚èŒü‚«
+			rot += 1;
+			rot %= 4;
+			break;
+		case 3:	// ¶ˆÚ“®
+			break;
+		case 5:	// ‰EˆÚ“®
+			break;
+		case 7:	// Œã‘Þ
+			break;
+		}
+	}
 };
 
 class Field
@@ -61,11 +89,15 @@ class Field
 
 	struct Tile
 	{
-		TileType type;
+		TileType type = TileType::floor;
 		std::unique_ptr<Object> object;
 	};
 
-	std::array<std::array<Tile, 8>, 8> map;
+public:
+	std::array<std::array<Tile, 35>, 19> map;
 	std::list<std::unique_ptr<Mob>> mob;
+	Grid grid;
+	
+	Field(int x, int y, int scroolX, int scroolY) :grid(x, y, scroolX, scroolY) {}
 };
 

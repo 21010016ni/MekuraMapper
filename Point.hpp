@@ -9,7 +9,7 @@ public:
 
 	explicit constexpr Point(const T& v = 0) :y(v), x(v) {}
 	explicit constexpr Point(const T& y, const T& x) :y(y), x(x) {}
-	~Point() {}
+	//constexpr ~Point() = default;
 
 	constexpr Point operator+(const Point& v)const noexcept { return Point(y + v.y, x + v.x); }
 	constexpr Point operator-(const Point& v)const noexcept { return Point(y - v.y, x - v.x); }

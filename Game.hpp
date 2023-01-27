@@ -3,7 +3,7 @@
 
 class Game
 {
-	static int command;
+	static inline int command = -1;
 
 public:
 	enum class Message
@@ -18,6 +18,7 @@ public:
 	static Message update();
 	static void draw();
 
+	static bool editmap();
 	static int pop();
 };
 

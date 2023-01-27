@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include <Windows.h>
+#include "Point.hpp"
 
 // 使用しない場合コメントアウト
 //#define USE_RESOURCE
@@ -23,6 +24,7 @@ namespace common
 
 	constexpr float pi = 3.14159265359f;
 	constexpr float pi2 = 6.28318530718f;
+	constexpr Point<int> null(-1);
 
 	inline bool onWindow(int x, int y) { return x >= 0 && x < width&& y >= 0 && y < height; }
 }

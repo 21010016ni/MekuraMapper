@@ -5,28 +5,19 @@
 
 #include "Handle.hpp"
 
-#include "Grid.hpp"
+#include "Field.hpp"
 
 #include "common_functions.hpp"
 
 Draw Game::display(0, 0, 0);
-Grid<35, 19> grid(24, 24, 204, 92);
-char tool = 0;
-char toolmode;
-Point<int> click;
+//Grid<35, 19> grid(24, 24, 204, 92);
+
+Field field(24, 24, 92, 204);
+char tool, brushColor, hasIcon;
+Point<int> prevPos = common::null;
 
 int graph[4];
-int testGraph;
-
 int se;
-int pan;
-int vol;
-Point<float> distance;
-
-// 鉛筆/消しゴム
-// 各色ブラシ/雑巾
-// オブジェクト配置
-//
 
 void Game::preset()
 {
@@ -36,7 +27,6 @@ void Game::preset()
 	graph[1] = LoadGraph("data/eraser.png");
 	graph[2] = LoadGraph("data/brush.png");
 	graph[3] = LoadGraph("data/cloth.png");
-	testGraph = LoadGraph("cursor.png");
 	se = LoadSoundMem("data/Footstep-low.wav");
 
 	for(int i = 0; i < 3; ++i)
@@ -78,7 +68,9 @@ Game::Message Game::update()
 	//	common::lc[1] = buf;
 	//}
 
-	grid.controll();
+	//grid.controll();
+
+	editmap();
 
 	//Particle::update();
 	return Message::none;
@@ -87,10 +79,10 @@ Game::Message Game::update()
 void Game::draw()
 {
 	DrawBox(0, 0, common::width, common::height, common::bc, true);
-	grid.draw();
+	field.grid.draw();
 	IconSet::draw();
 	//DrawGraph(Mouse::pos.x, Mouse::pos.y, testGraph, true);
-	switch(grid.tool)
+	switch(tool)
 	{
 	case 0:
 		if(Mouse::b2())
@@ -105,7 +97,7 @@ void Game::draw()
 			DrawGraph(Mouse::pos.x - 3, Mouse::pos.y - 3, graph[2], true);
 		break;
 	case 2:
-		DrawBox(Mouse::pos.x - 7, Mouse::pos.y - 7, Mouse::pos.x + 7, Mouse::pos.y + 7, grid.hasIcon * 6324891, true);
+		DrawBox(Mouse::pos.x - 7, Mouse::pos.y - 7, Mouse::pos.x + 7, Mouse::pos.y + 7, hasIcon * 6324891, true);
 		break;
 	}
 	if(Mouse::b3())
@@ -113,11 +105,132 @@ void Game::draw()
 		for(int i = 0; i < 8; ++i)
 		{
 			float x = std::cos(common::pi * i / 4), y = std::sin(common::pi * i / 4);
-			DrawLine(grid.circle.x + x * grid.ColorchangeActivateLength, grid.circle.y + y * grid.ColorchangeActivateLength, grid.circle.x + x * grid.ColorchangeActivateLength * 3, grid.circle.y + y * grid.ColorchangeActivateLength * 3, 0xffffffff);
+			DrawLine(prevPos.x + x * field.grid.ColorchangeActivateLength, prevPos.y + y * field.grid.ColorchangeActivateLength, prevPos.x + x * field.grid.ColorchangeActivateLength * 3, prevPos.y + y * field.grid.ColorchangeActivateLength * 3, 0xffffffff);
 		}
 	}
 
 	//Particle::draw();
+}
+
+bool Game::editmap()
+{
+	static Mouse::Log log;
+
+	if (Mouse::wheel != 0)
+	{
+		// ツール切り替え
+		tool ^= 1;
+		tool &= 1;
+		prevPos = common::null;
+		return true;
+	}
+	if (Mouse::getLog(log))
+	{
+		if (log.b3())
+		{
+			if (log.type)
+			{
+				if (tool == 0 || tool == 2)
+				{
+					// アイコンセットの表示非表示切り替え
+					IconSet::view ^= 1;
+				}
+				else if (tool == 1)
+				{
+					// 色切り替え表示
+					prevPos = log.pos;
+					return true;
+				}
+			}
+			else
+			{
+				if (tool == 1 && prevPos != common::null)
+				{
+					// 色切り替え決定
+					prevPos = log.pos - prevPos;
+					if (prevPos.length<float>() > Grid::ColorchangeActivateLength)
+					{
+						float buf = std::atan2f(prevPos.y, prevPos.x);
+						if (buf < 0)
+							buf += common::pi * 2;
+						buf /= common::pi / 4;
+						brushColor = static_cast<char>(floor(buf));
+					}
+				}
+			}
+		}
+		if (log.b1())
+		{
+			if (log.type)
+			{
+				char buf;
+				if (IconSet::view && IconSet::on(log.pos))
+				{
+					// アイコンセットからアイコンを持ち上げる
+					hasIcon = IconSet::get((log.pos - IconSet::display.pos) / IconSet::siz);
+					if (hasIcon != -1)
+					{
+						tool = 2;
+						prevPos = common::null;
+					}
+					return true;
+				}
+				else if (tool == 0 && common::onWindow(log.pos.x, log.pos.y) && (buf = field.grid.grid[(log.pos - display.pos) / field.grid.size].icon) != -1)
+				{
+					field.grid.TakeIcon(log.pos);
+					return true;
+				}
+			}
+			else
+			{
+				if (tool == 0)
+				{
+					prevPos = common::null;
+					return true;
+				}
+				if (tool == 2)
+				{
+					if (common::onWindow(log.pos.x, log.pos.y))
+					{
+						field.grid.DropIcon(log.pos,hasIcon);
+						tool = 0;
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	if (common::onWindow(Mouse::pos.x, Mouse::pos.y))
+	{
+		if (Mouse::b2())
+		{
+			if (tool == 0)
+			{
+				field.grid.EraseLine(Mouse::pos);
+				return true;
+			}
+			else if (tool == 1)
+			{
+				field.grid.EraseFace(Mouse::pos);
+				return true;
+			}
+		}
+		else if (Mouse::b1())
+		{
+			if (tool == 0)
+			{
+				field.grid.DrawLine(Mouse::pos, prevPos);
+				return true;
+			}
+			else if (tool == 1)
+			{
+				field.grid.DrawFace(Mouse::pos, brushColor);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 int Game::pop()

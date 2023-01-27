@@ -1,16 +1,14 @@
 #pragma once
-#include <cmath>
 #include <bitset>
 #include <array>
 #include "IconSet.hpp"
 #include "Draw.hpp"
 #include "Point.hpp"
-#include "Input.hpp"
 #include "common.hpp"
 
 constexpr size_t sizeX = 35, sizeY = 19;
 
-/*template<size_t sizeX,size_t sizeY>*/ class Grid
+class Grid
 {
 	struct Tile
 	{
@@ -46,13 +44,9 @@ public:
 	GridData<sizeX, sizeY> grid;
 	Point<int> size;
 
-	char tool, brushColor, hasIcon;
-	Point<int> prevPos;
-	
 	static constexpr int lineThick = 4, ColorchangeActivateLength = 30, ColorNum = 8;
-	static inline const Point<int> null = Point<int>(-1);
 
-	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :size(y, x), display(scroolY, scroolX, 0), tool(0), brushColor(0), hasIcon(-1), linePoint(-1, -1), circle(-1, -1) {}
+	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :size(y, x), display(scroolX, scroolY, 0) {}
 
 	Point<int> GetRelativePoint(const Point<int>& mouse)
 	{
@@ -62,38 +56,32 @@ public:
 	const Point<int> GetGridPoint(const Point<int>& p)const
 	{
 		auto buf = (p + size / 2) / size;
-		return (p.distance<float>(buf * size) < size.length<float>() / 2) ? buf : null;
-	}
-
-	// 線やサークル始点をリセットする
-	void ResetPos()
-	{
-		prevPos = null;
+		return (p.distance<float>(buf * size) < size.length<float>() / 2) ? buf : common::null;
 	}
 
 	// 線を引く
-	void DrawLine(const Point<int>& mouse)
+	void DrawLine(const Point<int>& mouse, Point<int>& prev)
 	{
 		auto buf = GetGridPoint(GetRelativePoint(mouse));
-		if (buf != null)
+		if (buf != common::null)
 		{
-			if (prevPos != null && ((buf.y != 0 && buf.y != sizeY - 1 && buf.x != 0 && buf.x != sizeX - 1) || (buf.y != prevPos.y && buf.x != prevPos.x)))	// 両方とも画面端だった場合無効化
+			if (prev != common::null && ((buf.y != 0 && buf.y != sizeY - 1 && buf.x != 0 && buf.x != sizeX - 1) || (buf.y != prev.y && buf.x != prev.x)))	// 両方とも画面端だった場合無効化
 			{
 				// SE再生()
-				auto dif = prevPos - buf;
+				auto dif = prev - buf;
 				while (dif.y != 0 || dif.x != 0)
 				{
 					if (abs(dif.x) > abs(dif.y))
 					{
-						grid[prevPos.y - dif.y][prevPos.x - (dif.x > 0 ? dif.x-- : ++dif.x)].set(0, true);
+						grid[prev.y - dif.y][prev.x - (dif.x > 0 ? dif.x-- : ++dif.x)].set(0, true);
 					}
 					else
 					{
-						grid[prevPos.y - (dif.y > 0 ? dif.y-- : ++dif.y)][prevPos.x - dif.x].set(1, true);
+						grid[prev.y - (dif.y > 0 ? dif.y-- : ++dif.y)][prev.x - dif.x].set(1, true);
 					}
 				}
 			}
-			prevPos = buf;
+			prev = buf;
 		}
 	}
 
@@ -101,200 +89,73 @@ public:
 	void EraseLine(const Point<int>& mouse)
 	{
 		auto buf = GetRelativePoint(mouse);
+		bool se = false;
 		if ((buf.y + lineThick) % size.y <= lineThick * 2)
 		{
 			grid[(buf + Point<int>(lineThick, 0)) / size].set(0, false);
+			se = true;
 		}
 		if ((buf.x + lineThick) % size.x <= lineThick * 2)
 		{
 			grid[(buf + Point<int>(0, lineThick)) / size].set(1, false);
+			se = true;
+		}
+		if (se)
+		{
+			// SE再生()
 		}
 	}
 
 	// 地図上のアイコンを持ち上げる
-	bool TakeIcon(const Point<int>& mouse)
+	char TakeIcon(const Point<int>& mouse)
 	{
-		auto buf = GetRelativePoint(mouse);
-		auto& icon = grid[buf / size].icon;
-		if (icon != -1)
+		char ret = -1;
+		auto& buf = grid[GetRelativePoint(mouse) / size].icon;
+		if (buf != -1)
 		{
 			// SE再生()
-			tool = 2;
-			hasIcon = icon;
-			icon = -1;
-			ResetPos();
-			return true;
+			ret = buf;
+			buf = -1;
+			//ResetPos();
 		}
-		return false;
+		return ret;
 	}
 
-	
-
-	bool controll()
+	// 面を塗る
+	void DrawFace(const Point<int>& mouse, char color)
 	{
-		static Mouse::Log log;
-
-		if (Mouse::wheel != 0)
-		{
-			// ツール切り替え
-			tool ^= 1;
-			tool &= 1;
-			linePoint = null;
-			circle = null;
-			return true;
-		}
-		if (Mouse::getLog(log))
-		{
-			if (log.b3())
-			{
-				if (log.type)
-				{
-					if (tool == 0 || tool == 2)
-					{
-						// アイコンセットの表示非表示切り替え
-						IconSet::view ^= 1;
-					}
-					else if (tool == 1)
-					{
-						// 色切り替え表示
-						circle = log.pos;
-						return true;
-					}
-				}
-				else
-				{
-					if (tool == 1 && circle != null)
-					{
-						// 色切り替え決定
-						circle = log.pos - circle;
-						if (circle.length<float>() > ColorchangeActivateLength)
-						{
-							float buf = std::atan2f(circle.y, circle.x);
-							if (buf < 0)
-								buf += common::pi * 2;
-							buf /= common::pi / 4;
-							brushColor = static_cast<char>(floor(buf));
-						}
-					}
-				}
-			}
-			if (log.b1())
-			{
-				if (log.type)
-				{
-					char buf;
-					if (IconSet::view && IconSet::on(log.pos))
-					{
-						// アイコンセットからアイコンを持ち上げる
-						hasIcon = IconSet::get((log.pos - IconSet::display.pos) / IconSet::siz);
-						if (hasIcon != -1)
-						{
-							tool = 2;
-							linePoint = null;
-							circle = null;
-						}
-						return true;
-					}
-					else if (tool == 0 && common::onWindow(log.pos.x, log.pos.y) && (buf = grid[(log.pos - display.pos) / size].icon) != -1)
-					{
-						// アイコンを持ち上げる
-						// SE再生
-						grid[(log.pos - display.pos) / size].icon = -1;
-						tool = 2;
-						hasIcon = buf;
-						linePoint = null;
-						return true;
-					}
-				}
-				else
-				{
-					if (tool == 0)
-					{
-						linePoint = null;
-						return true;
-					}
-					if (tool == 2)
-					{
-						if (common::onWindow(log.pos.x, log.pos.y))
-						{
-							// アイコンを置く
-							if (!IconSet::view || !IconSet::on(log.pos)) // アイコンセット以外の場所にドロップしたなら置く
-							{
-								grid[(log.pos - display.pos) / size].icon = hasIcon;
-							}
-							tool = 0;
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		if (common::onWindow(Mouse::pos.x, Mouse::pos.y))
-		{
-			if (Mouse::b2())
-			{
-				if (tool == 0)
-				{
-					// 線を消す
-					if ((Mouse::pos.y - display.pos.y + lineThick) % size.y <= lineThick * 2)
-					{
-						grid[(Mouse::pos - display.pos + Point<int>(lineThick, 0)) / size].set(0, false);
-					}
-					if ((Mouse::pos.x - display.pos.x + lineThick) % size.x <= lineThick * 2)
-					{
-						grid[(Mouse::pos - display.pos + Point<int>(0, lineThick)) / size].set(1, false);
-					}
-					return true;
-				}
-				else if (tool == 1)
-				{
-					// 面を消す
-					grid[(Mouse::pos - display.pos) / size].face = -1;
-					return true;
-				}
-			}
-			else if (Mouse::b1())
-			{
-				if (tool == 0)
-				{
-					// 線を引く
-					Point<int> buf = linePoint;
-					linePoint = GetGridPoint(Mouse::pos - display.pos);
-					if (linePoint != null)
-					{
-						if (buf != null)
-						{
-							buf = linePoint - buf;
-							while (buf.y != 0 || buf.x != 0)
-							{
-								if (abs(buf.x) > abs(buf.y))
-								{
-									grid[linePoint.y - buf.y][linePoint.x - (buf.x > 0 ? buf.x-- : ++buf.x)].set(0, true);
-								}
-								else
-								{
-									grid[linePoint.y - (buf.y > 0 ? buf.y-- : ++buf.y)][linePoint.x - buf.x].set(1, true);
-								}
-							}
-						}
-					}
-					else
-					{
-						linePoint = buf;
-					}
-					return true;
-				}
-				else if (tool == 1)
-				{
-					// 面を塗る
-					grid[(Mouse::pos - display.pos) / size].face = brushColor;
-					return true;
-				}
-			}
-		}
-		return false;
+		// SE再生()
+		grid[GetRelativePoint(mouse) / size].face = color;
 	}
+
+	// 面を消す
+	void EraseFace(const Point<int>& mouse)
+	{
+		// SE再生()
+		grid[GetRelativePoint(mouse) / size].face = -1;
+	}
+
+	// アイコンを置く
+	void DropIcon(const Point<int>& mouse, char icon)
+	{
+		if (!IconSet::view || !IconSet::on(mouse)) // アイコンセット以外の場所にドロップしたなら置く
+		{
+			// SE再生()
+			grid[GetRelativePoint(mouse) / size].icon = icon;
+		}
+		else
+		{
+			// SE再生()
+		}
+	}
+
+	// ツール切り替え
+	//void SwitchTool()
+	//{
+	//	tool ^= 1;
+	//	tool &= 1;
+	//	prevPos = null;
+	//}
 
 	void draw()
 	{
