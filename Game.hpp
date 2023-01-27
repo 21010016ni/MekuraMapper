@@ -3,6 +3,8 @@
 
 class Game
 {
+	static int command;
+
 public:
 	enum class Message
 	{
@@ -15,5 +17,7 @@ public:
 	static void preset();
 	static Message update();
 	static void draw();
+
+	static int pop();
 };
 

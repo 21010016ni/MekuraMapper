@@ -9,9 +9,9 @@ class SoundList
 	{
 		int handle;
 		int playtype;
-		Point<int> pos;
+		Point<float> pos;
 
-		Sound(int handle, int playtype, Point<int> pos) :handle(handle), playtype(playtype), pos(pos) {}
+		Sound(int handle, int playtype, Point<float> pos) :handle(handle), playtype(playtype), pos(pos) {}
 	};
 
 	struct Listener
@@ -53,7 +53,7 @@ class SoundList
 	Listener listener;
 
 public:
-	void push(int handle, int playtype, Point<int> pos);
+	void push(int handle, int playtype, Point<float> pos);
 	void update();
 };
 

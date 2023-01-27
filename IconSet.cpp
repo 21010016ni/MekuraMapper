@@ -2,7 +2,11 @@
 #include <DxLib.h>
 #include "UI.hpp"
 
-void IconSet::draw()const
+bool IconSet::view(true);
+Draw IconSet::display(0, 0, 1);
+Point<int> IconSet::siz(16, 16);
+
+void IconSet::draw()/*const*/
 {
 	if (view)
 	{

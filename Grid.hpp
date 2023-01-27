@@ -8,7 +8,9 @@
 #include "Input.hpp"
 #include "common.hpp"
 
-template<size_t sizeX,size_t sizeY> class Grid
+constexpr size_t sizeX = 35, sizeY = 19;
+
+/*template<size_t sizeX,size_t sizeY>*/ class Grid
 {
 	struct Tile
 	{
@@ -43,15 +45,90 @@ public:
 
 	GridData<sizeX, sizeY> grid;
 	Point<int> size;
-	IconSet iconset;
 
 	char tool, brushColor, hasIcon;
-	Point<int> linePoint, circle;
+	Point<int> prevPos;
 	
 	static constexpr int lineThick = 4, ColorchangeActivateLength = 30, ColorNum = 8;
 	static inline const Point<int> null = Point<int>(-1);
 
-	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :size(y, x), display(scroolY, scroolX, 0), iconset(0, 0, 16, 16), tool(0), brushColor(0), hasIcon(-1), linePoint(-1, -1), circle(-1, -1) {}
+	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :size(y, x), display(scroolY, scroolX, 0), tool(0), brushColor(0), hasIcon(-1), linePoint(-1, -1), circle(-1, -1) {}
+
+	Point<int> GetRelativePoint(const Point<int>& mouse)
+	{
+		return mouse - display.pos;
+	}
+
+	const Point<int> GetGridPoint(const Point<int>& p)const
+	{
+		auto buf = (p + size / 2) / size;
+		return (p.distance<float>(buf * size) < size.length<float>() / 2) ? buf : null;
+	}
+
+	// 線やサークル始点をリセットする
+	void ResetPos()
+	{
+		prevPos = null;
+	}
+
+	// 線を引く
+	void DrawLine(const Point<int>& mouse)
+	{
+		auto buf = GetGridPoint(GetRelativePoint(mouse));
+		if (buf != null)
+		{
+			if (prevPos != null && ((buf.y != 0 && buf.y != sizeY - 1 && buf.x != 0 && buf.x != sizeX - 1) || (buf.y != prevPos.y && buf.x != prevPos.x)))	// 両方とも画面端だった場合無効化
+			{
+				// SE再生()
+				auto dif = prevPos - buf;
+				while (dif.y != 0 || dif.x != 0)
+				{
+					if (abs(dif.x) > abs(dif.y))
+					{
+						grid[prevPos.y - dif.y][prevPos.x - (dif.x > 0 ? dif.x-- : ++dif.x)].set(0, true);
+					}
+					else
+					{
+						grid[prevPos.y - (dif.y > 0 ? dif.y-- : ++dif.y)][prevPos.x - dif.x].set(1, true);
+					}
+				}
+			}
+			prevPos = buf;
+		}
+	}
+
+	// 線を消す
+	void EraseLine(const Point<int>& mouse)
+	{
+		auto buf = GetRelativePoint(mouse);
+		if ((buf.y + lineThick) % size.y <= lineThick * 2)
+		{
+			grid[(buf + Point<int>(lineThick, 0)) / size].set(0, false);
+		}
+		if ((buf.x + lineThick) % size.x <= lineThick * 2)
+		{
+			grid[(buf + Point<int>(0, lineThick)) / size].set(1, false);
+		}
+	}
+
+	// 地図上のアイコンを持ち上げる
+	bool TakeIcon(const Point<int>& mouse)
+	{
+		auto buf = GetRelativePoint(mouse);
+		auto& icon = grid[buf / size].icon;
+		if (icon != -1)
+		{
+			// SE再生()
+			tool = 2;
+			hasIcon = icon;
+			icon = -1;
+			ResetPos();
+			return true;
+		}
+		return false;
+	}
+
+	
 
 	bool controll()
 	{
@@ -75,7 +152,7 @@ public:
 					if (tool == 0 || tool == 2)
 					{
 						// アイコンセットの表示非表示切り替え
-						iconset.view ^= 1;
+						IconSet::view ^= 1;
 					}
 					else if (tool == 1)
 					{
@@ -106,10 +183,10 @@ public:
 				if (log.type)
 				{
 					char buf;
-					if (iconset.view && iconset.on(log.pos))
+					if (IconSet::view && IconSet::on(log.pos))
 					{
 						// アイコンセットからアイコンを持ち上げる
-						hasIcon = iconset.get((log.pos - iconset.display.pos) / iconset.siz);
+						hasIcon = IconSet::get((log.pos - IconSet::display.pos) / IconSet::siz);
 						if (hasIcon != -1)
 						{
 							tool = 2;
@@ -141,7 +218,7 @@ public:
 						if (common::onWindow(log.pos.x, log.pos.y))
 						{
 							// アイコンを置く
-							if (!iconset.view || !iconset.on(log.pos)) // アイコンセット以外の場所にドロップしたなら置く
+							if (!IconSet::view || !IconSet::on(log.pos)) // アイコンセット以外の場所にドロップしたなら置く
 							{
 								grid[(log.pos - display.pos) / size].icon = hasIcon;
 							}
@@ -217,12 +294,6 @@ public:
 			}
 		}
 		return false;
-	}
-
-	const Point<int> GetGridPoint(const Point<int>& p)const
-	{
-		auto buf = (p + size / 2) / size;
-		return (p.distance<float>(buf * size) < size.length<float>() / 2) ? buf : null;
 	}
 
 	void draw()

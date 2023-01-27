@@ -45,6 +45,11 @@ class Mob
 	Point<int> pos;
 };
 
+class Player :public Mob
+{
+
+};
+
 class Field
 {
 	enum class TileType
@@ -61,6 +66,6 @@ class Field
 	};
 
 	std::array<std::array<Tile, 8>, 8> map;
-	std::list<Mob> mob;
+	std::list<std::unique_ptr<Mob>> mob;
 };
 

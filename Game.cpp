@@ -41,10 +41,10 @@ void Game::preset()
 
 	for(int i = 0; i < 3; ++i)
 	{
-		grid.iconset.icon.emplace_back();
+		IconSet::icon.emplace_back();
 		for(int j = 0; j < 15; ++j)
 		{
-			grid.iconset.icon.back().emplace_back(i * 15 + j);
+			IconSet::icon.back().emplace_back(i * 15 + j);
 		}
 	}
 }
@@ -56,27 +56,27 @@ Game::Message Game::update()
 		return Message::quit;
 	}
 
-	if(Keyboard::push('C'))
-	{
-		int buf;
-		printf("%d面の色を入力 : ", grid.brushColor);
-		scanf_s("%x", &buf);
-		common::fc[grid.brushColor] = buf;
-	}
-	else if(Keyboard::push('T'))
-	{
-		int buf;
-		printf("有効線の色を入力 : ");
-		scanf_s("%x", &buf);
-		common::lc[0] = buf;
-	}
-	else if(Keyboard::push('F'))
-	{
-		int buf;
-		printf("無効線の色を入力 : ");
-		scanf_s("%x", &buf);
-		common::lc[1] = buf;
-	}
+	//if(Keyboard::push('C'))
+	//{
+	//	int buf;
+	//	printf("%d面の色を入力 : ", grid.brushColor);
+	//	scanf_s("%x", &buf);
+	//	common::fc[grid.brushColor] = buf;
+	//}
+	//else if(Keyboard::push('T'))
+	//{
+	//	int buf;
+	//	printf("有効線の色を入力 : ");
+	//	scanf_s("%x", &buf);
+	//	common::lc[0] = buf;
+	//}
+	//else if(Keyboard::push('F'))
+	//{
+	//	int buf;
+	//	printf("無効線の色を入力 : ");
+	//	scanf_s("%x", &buf);
+	//	common::lc[1] = buf;
+	//}
 
 	grid.controll();
 
@@ -88,7 +88,7 @@ void Game::draw()
 {
 	DrawBox(0, 0, common::width, common::height, common::bc, true);
 	grid.draw();
-	grid.iconset.draw();
+	IconSet::draw();
 	//DrawGraph(Mouse::pos.x, Mouse::pos.y, testGraph, true);
 	switch(grid.tool)
 	{
@@ -118,5 +118,12 @@ void Game::draw()
 	}
 
 	//Particle::draw();
+}
+
+int Game::pop()
+{
+	int ret = command;
+	command = -1;
+	return ret;
 }
 

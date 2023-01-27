@@ -29,7 +29,7 @@ void SoundList::Listener::update()
 	}
 }
 
-void SoundList::push(int handle, int playtype, Point<int> pos)
+void SoundList::push(int handle, int playtype, Point<float> pos)
 {
 	list.emplace_back(handle, playtype, pos);
 }
