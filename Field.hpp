@@ -49,6 +49,9 @@ public:
 	virtual void routine() = 0;
 };
 
+//  0
+// 3 1
+//  2
 
 class Player :public Mob
 {
@@ -69,10 +72,13 @@ class Player :public Mob
 			rot %= 4;
 			break;
 		case 3:	// ç∂à⁄ìÆ
+			(rot % 2 == 0) ? pos.x : pos.y += (rot / 2 == 0) ? -1 : 1;
 			break;
 		case 5:	// âEà⁄ìÆ
+			(rot % 2 == 0) ? pos.x : pos.y += (rot / 2 == 0) ? 1 : -1;
 			break;
 		case 7:	// å„ëﬁ
+			(rot % 2 == 0) ? pos.y : pos.x += (rot / 2 == 0) ? -1 : 1;
 			break;
 		}
 	}
@@ -99,5 +105,7 @@ public:
 	Grid grid;
 	
 	Field(int x, int y, int scroolX, int scroolY) :grid(x, y, scroolX, scroolY) {}
+
+	void update();
 };
 

@@ -74,6 +74,21 @@ void Draw::blend(unsigned char mode, unsigned char value)
 	SetDrawBlendMode(mode, value);
 }
 
+void  Draw::area()
+{
+	SetDrawAreaFull();
+}
+
+void  Draw::area(int width, int height)
+{
+	SetDrawArea(pos.x, pos.y, pos.x + width, pos.y + height);
+}
+
+void  Draw::area(const Point<int>& size)
+{
+	SetDrawArea(pos.x, pos.y, pos.x + size.x, pos.y + size.y);
+}
+
 void Draw::pixel(int x, int y, unsigned int color)const
 {
 	DrawPixel(static_cast<int>(shake.x(lv)) + pos.x + x, static_cast<int>(shake.y(lv)) + pos.y + y, color);

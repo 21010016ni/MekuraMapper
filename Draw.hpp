@@ -93,6 +93,9 @@ public:
 
 	static void blend();
 	static void blend(unsigned char mode, unsigned char value);
+	static void area();
+	void area(int width, int height);
+	void area(const Point<int>& size);
 
 	void pixel(int x, int y, unsigned int color)const;
 	void pixel(const Point<int>& dst, unsigned int color)const;

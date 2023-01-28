@@ -42,11 +42,11 @@ public:
 	Draw display;
 
 	GridData<sizeX, sizeY> grid;
-	Point<int> size;
+	Point<int> gridSize, screenSize;
 
 	static constexpr int lineThick = 4, ColorchangeActivateLength = 30, ColorNum = 8;
 
-	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :size(y, x), display(scroolX, scroolY, 0) {}
+	Grid(int x, int y, int scroolX = 0, int scroolY = 0) :gridSize(y, x), display(scroolX, scroolY, 0) {}
 
 	Point<int> GetRelativePoint(const Point<int>& mouse)
 	{
@@ -55,8 +55,8 @@ public:
 
 	const Point<int> GetGridPoint(const Point<int>& p)const
 	{
-		auto buf = (p + size / 2) / size;
-		return (p.distance<float>(buf * size) < size.length<float>() / 2) ? buf : common::null;
+		auto buf = (p + gridSize / 2) / gridSize;
+		return (p.distance<float>(buf * gridSize) < gridSize.length<float>() / 2) ? buf : common::null;
 	}
 
 	// 線を引く
@@ -90,14 +90,14 @@ public:
 	{
 		auto buf = GetRelativePoint(mouse);
 		bool se = false;
-		if ((buf.y + lineThick) % size.y <= lineThick * 2)
+		if ((buf.y + lineThick) % gridSize.y <= lineThick * 2)
 		{
-			grid[(buf + Point<int>(lineThick, 0)) / size].set(0, false);
+			grid[(buf + Point<int>(lineThick, 0)) / gridSize].set(0, false);
 			se = true;
 		}
-		if ((buf.x + lineThick) % size.x <= lineThick * 2)
+		if ((buf.x + lineThick) % gridSize.x <= lineThick * 2)
 		{
-			grid[(buf + Point<int>(0, lineThick)) / size].set(1, false);
+			grid[(buf + Point<int>(0, lineThick)) / gridSize].set(1, false);
 			se = true;
 		}
 		if (se)
@@ -110,7 +110,7 @@ public:
 	char TakeIcon(const Point<int>& mouse)
 	{
 		char ret = -1;
-		auto& buf = grid[GetRelativePoint(mouse) / size].icon;
+		auto& buf = grid[GetRelativePoint(mouse) / gridSize].icon;
 		if (buf != -1)
 		{
 			// SE再生()
@@ -125,14 +125,14 @@ public:
 	void DrawFace(const Point<int>& mouse, char color)
 	{
 		// SE再生()
-		grid[GetRelativePoint(mouse) / size].face = color;
+		grid[GetRelativePoint(mouse) / gridSize].face = color;
 	}
 
 	// 面を消す
 	void EraseFace(const Point<int>& mouse)
 	{
 		// SE再生()
-		grid[GetRelativePoint(mouse) / size].face = -1;
+		grid[GetRelativePoint(mouse) / gridSize].face = -1;
 	}
 
 	// アイコンを置く
@@ -141,7 +141,7 @@ public:
 		if (!IconSet::view || !IconSet::on(mouse)) // アイコンセット以外の場所にドロップしたなら置く
 		{
 			// SE再生()
-			grid[GetRelativePoint(mouse) / size].icon = icon;
+			grid[GetRelativePoint(mouse) / gridSize].icon = icon;
 		}
 		else
 		{
@@ -159,10 +159,15 @@ public:
 
 	void draw()
 	{
+		//display.area(screenSize);
 		for (int y = 0; y < sizeY; ++y)
 		{
+			if (y * gridSize.y >= screenSize.y)
+				break;
 			for (int x = 0; x < sizeX; ++x)
 			{
+				if (x * gridSize.x >= screenSize.x)
+					break;
 				int color = -1;
 				switch (grid[y][x].face)
 				{
@@ -177,16 +182,17 @@ public:
 				case 7:color = common::fc[7]; break;
 				}
 				if (color != -1)
-					display.box(x * size.x, y * size.y, size.x, size.y, color, true);
-				display.line(x * size.x, y * size.y, (x + 1) * size.x, y * size.y, grid[y][x].up() ? common::lc[0] : common::lc[1], grid[y][x].up() ? 2 : 1);
-				display.line(x * size.x, y * size.y, x * size.x, (y + 1) * size.y, grid[y][x].left() ? common::lc[0] : common::lc[1], grid[y][x].left() ? 2 : 1);
+					display.box(x * gridSize.x, y * gridSize.y, gridSize.x, gridSize.y, color, true);
+				display.line(x * gridSize.x, y * gridSize.y, (x + 1) * gridSize.x, y * gridSize.y, grid[y][x].up() ? common::lc[0] : common::lc[1], grid[y][x].up() ? 2 : 1);
+				display.line(x * gridSize.x, y * gridSize.y, x * gridSize.x, (y + 1) * gridSize.y, grid[y][x].left() ? common::lc[0] : common::lc[1], grid[y][x].left() ? 2 : 1);
 				if (grid[y][x].icon != -1)
 				{
-					display.box(x * size.x + 3, y * size.y + 3, size.x - 5, size.y - 5, grid[y][x].icon * 6324891, true);
+					display.box(x * gridSize.x + 3, y * gridSize.y + 3, gridSize.x - 5, gridSize.y - 5, grid[y][x].icon * 6324891, true);
 				}
 			}
 		}
-		display.circle(12 * size.x + size.x / 2, 7 * size.y + size.y / 2, size.x / 2, 0xffffff, true);
+
+		// ここにMobの描画？　いる？　というかここでMobの情報取得するの無理じゃんね
 	}
 };
 

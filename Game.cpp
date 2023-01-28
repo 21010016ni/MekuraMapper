@@ -70,6 +70,8 @@ Game::Message Game::update()
 
 	//grid.controll();
 
+
+
 	editmap();
 
 	//Particle::update();
@@ -79,7 +81,12 @@ Game::Message Game::update()
 void Game::draw()
 {
 	DrawBox(0, 0, common::width, common::height, common::bc, true);
+
+	// ここ、外から地図エリアの描画制限を掛けてるけど、そもそも描画機能をGridに渡さないように　Gridではなくフィールド、もしくは描画するUI側からアクセスする
+	field.grid.display.area(field.grid.screenSize);
 	field.grid.draw();
+	
+
 	IconSet::draw();
 	//DrawGraph(Mouse::pos.x, Mouse::pos.y, testGraph, true);
 	switch(tool)
@@ -175,7 +182,7 @@ bool Game::editmap()
 					}
 					return true;
 				}
-				else if (tool == 0 && common::onWindow(log.pos.x, log.pos.y) && (buf = field.grid.grid[(log.pos - display.pos) / field.grid.size].icon) != -1)
+				else if (tool == 0 && (Mouse::pos.y >= field.grid.display.pos.y && Mouse::pos.y < field.grid.screenSize.y && Mouse::pos.x >= field.grid.display.pos.x && Mouse::pos.x < field.grid.screenSize.x))
 				{
 					field.grid.TakeIcon(log.pos);
 					return true;
@@ -190,18 +197,23 @@ bool Game::editmap()
 				}
 				if (tool == 2)
 				{
-					if (common::onWindow(log.pos.x, log.pos.y))
+					if ((IconSet::view && IconSet::on(log.pos)) || Mouse::pos.y < field.grid.display.pos.y && Mouse::pos.y >= field.grid.screenSize.y && Mouse::pos.x < field.grid.display.pos.x && Mouse::pos.x >= field.grid.screenSize.x)
 					{
-						field.grid.DropIcon(log.pos,hasIcon);
-						tool = 0;
-						return true;
+						// アイコンを捨てた
 					}
+					else
+					{
+						// アイコンを置いた
+						field.grid.DropIcon(log.pos, hasIcon);
+					}
+					tool = 0;
+					return true;
 				}
 			}
 		}
 	}
 
-	if (common::onWindow(Mouse::pos.x, Mouse::pos.y))
+	if (Mouse::pos.y >= field.grid.display.pos.y && Mouse::pos.y < field.grid.screenSize.y && Mouse::pos.x >= field.grid.display.pos.x && Mouse::pos.x < field.grid.screenSize.x)
 	{
 		if (Mouse::b2())
 		{
