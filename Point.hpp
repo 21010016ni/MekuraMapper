@@ -19,6 +19,8 @@ public:
 	constexpr Point operator*(const T& v)const noexcept { return Point(y * v, x * v); }
 	constexpr Point operator/(const T& v)const noexcept { return Point(y / v, x / v); }
 
+	Point& operator=(const Point& v)noexcept { return y = v.y, x = v.x, *this; }
+
 	Point& operator+=(const Point& v)noexcept { return y += v.y, x += v.x, *this; }
 	Point& operator-=(const Point& v)noexcept { return y -= v.y, x -= v.x, *this; }
 	Point& operator*=(const Point& v)noexcept { return y *= v.y, x *= v.x, *this; }
@@ -30,6 +32,7 @@ public:
 	auto operator<=>(const Point&)const = default;
 
 	constexpr Point operator()(const T& t)const noexcept { return Point(t / x, t % x); }
+	constexpr Point<float> operator()(const float& t) = delete;
 
 	constexpr Point approximate(const Point& siz, int level)const { return Point(y / (siz.y / level), x / (siz.x / level)); }
 	constexpr Point normalize()const { return *this / length<T>(); }

@@ -45,7 +45,10 @@ class Mob
 {
 public:
 	Point<int> pos;
-	char rot;	// ^0,>1,v2,<3 
+	char rot;	// ^0,>1,v2,<3
+
+	Mob(int x, int y, char rot) :pos(y, x), rot(rot) {}
+
 	virtual void routine() = 0;
 };
 
@@ -55,6 +58,7 @@ public:
 
 class Player :public Mob
 {
+public:
 	void routine()override
 	{
 		switch (Game::pop())
@@ -65,23 +69,25 @@ class Player :public Mob
 				rot += 4;
 			break;
 		case 1:	// 前進
-			(rot % 2 == 0) ? pos.y : pos.x += (rot / 2 == 0) ? 1 : -1;
+			((rot % 2 == 0) ? pos.y : pos.x) += (rot / 2 == 0) ? -1 : 1;
 			break;
 		case 2:	// 右振り向き
 			rot += 1;
 			rot %= 4;
 			break;
 		case 3:	// 左移動
-			(rot % 2 == 0) ? pos.x : pos.y += (rot / 2 == 0) ? -1 : 1;
+			((rot % 2 == 0) ? pos.x : pos.y) += (rot / 2 == 0) ? -1 : 1;
 			break;
 		case 5:	// 右移動
-			(rot % 2 == 0) ? pos.x : pos.y += (rot / 2 == 0) ? 1 : -1;
+			((rot % 2 == 0) ? pos.x : pos.y) += (rot / 2 == 0) ? 1 : -1;
 			break;
 		case 7:	// 後退
-			(rot % 2 == 0) ? pos.y : pos.x += (rot / 2 == 0) ? -1 : 1;
+			((rot % 2 == 0) ? pos.y : pos.x) += (rot / 2 == 0) ? 1 : -1;
 			break;
 		}
 	}
+
+	Player(int x, int y, char rot) :Mob(x, y, rot) {}
 };
 
 class Field
@@ -104,7 +110,7 @@ public:
 	std::list<std::unique_ptr<Mob>> mob;
 	Grid grid;
 	
-	Field(int x, int y, int scroolX, int scroolY) :grid(x, y, scroolX, scroolY) {}
+	Field() :grid() {}
 
 	void update();
 };

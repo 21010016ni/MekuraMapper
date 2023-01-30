@@ -6,13 +6,15 @@
 #include "Handle.hpp"
 
 #include "Field.hpp"
+#include "IconSet.hpp"
+#include "UI.hpp"
 
 #include "common_functions.hpp"
 
 Draw Game::display(0, 0, 0);
 //Grid<35, 19> grid(24, 24, 204, 92);
 
-Field field(24, 24, 92, 204);
+Field field;
 char tool, brushColor, hasIcon;
 Point<int> prevPos = common::null;
 
@@ -37,6 +39,8 @@ void Game::preset()
 			IconSet::icon.back().emplace_back(i * 15 + j);
 		}
 	}
+
+	field.mob.emplace_back(new Player(5, 5, 0));
 }
 
 Game::Message Game::update()
@@ -68,11 +72,37 @@ Game::Message Game::update()
 	//	common::lc[1] = buf;
 	//}
 
-	//grid.controll();
-
-
-
 	editmap();
+
+	if (Keyboard::push('Q'))
+	{
+		command = 0;
+	}
+	else if (Keyboard::push('W'))
+	{
+		command = 1;
+	}
+	else if (Keyboard::push('E'))
+	{
+		command = 2;
+	}
+	else if (Keyboard::push('A'))
+	{
+		command = 3;
+	}
+	else if (Keyboard::push('D'))
+	{
+		command = 5;
+	}
+	else if (Keyboard::push('S'))
+	{
+		command = 7;
+	}
+
+	if (command != -1)
+	{
+		field.update();
+	}
 
 	//Particle::update();
 	return Message::none;
@@ -83,9 +113,24 @@ void Game::draw()
 	DrawBox(0, 0, common::width, common::height, common::bc, true);
 
 	// ここ、外から地図エリアの描画制限を掛けてるけど、そもそも描画機能をGridに渡さないように　Gridではなくフィールド、もしくは描画するUI側からアクセスする
-	field.grid.display.area(field.grid.screenSize);
-	field.grid.draw();
+	//field.grid.display.area(field.grid.screenSize);
+	//field.grid.draw();
+	UI::map.area(UI::mapSize);
+	UI::draw(field.grid);
+	for (const auto& i : field.mob)
+	{
+		if ((i->pos.y - 1) * UI::gridSize.y >= UI::map.pos.y || i->pos.y * UI::gridSize.y + UI::map.pos.y < UI::mapSize.y ||
+			(i->pos.x - 1) * UI::gridSize.x >= UI::map.pos.x || i->pos.x * UI::gridSize.x + UI::map.pos.x < UI::mapSize.x)
+		{
+			auto p = i->pos * UI::gridSize + UI::gridSize / 2;
+			auto r = __min(UI::gridSize.y, UI::gridSize.x) / 2;
+			float ang = (common::pi / 2) * (-i->rot + 2);
+			UI::map.circle(p, r, 0xffffff, true);
+			UI::map.triangle(p + Point<int>(std::cosf(ang) * r, std::sinf(ang) * r), p + Point<int>(std::cosf(ang + common::pi2 / 3) * r, std::sinf(ang + common::pi2 / 3) * r), p + Point<int>(std::cosf(ang - common::pi2 / 3) * r, std::sinf(ang - common::pi2 / 3) * r), 0xaaaaaa, true);
+		}
+	}
 	
+	Draw::area();
 
 	IconSet::draw();
 	//DrawGraph(Mouse::pos.x, Mouse::pos.y, testGraph, true);
@@ -182,9 +227,11 @@ bool Game::editmap()
 					}
 					return true;
 				}
-				else if (tool == 0 && (Mouse::pos.y >= field.grid.display.pos.y && Mouse::pos.y < field.grid.screenSize.y && Mouse::pos.x >= field.grid.display.pos.x && Mouse::pos.x < field.grid.screenSize.x))
+				else if (tool == 0 && (Mouse::pos.y >= UI::map.pos.y && Mouse::pos.y < UI::map.pos.y + UI::mapSize.y && Mouse::pos.x >= UI::map.pos.x && Mouse::pos.x < UI::map.pos.x + UI::mapSize.x))
 				{
-					field.grid.TakeIcon(log.pos);
+					hasIcon = field.grid.TakeIcon(log.pos);
+					if (hasIcon != -1)
+						tool = 2;
 					return true;
 				}
 			}
@@ -197,7 +244,7 @@ bool Game::editmap()
 				}
 				if (tool == 2)
 				{
-					if ((IconSet::view && IconSet::on(log.pos)) || Mouse::pos.y < field.grid.display.pos.y && Mouse::pos.y >= field.grid.screenSize.y && Mouse::pos.x < field.grid.display.pos.x && Mouse::pos.x >= field.grid.screenSize.x)
+					if ((IconSet::view && IconSet::on(log.pos)) || Mouse::pos.y < UI::map.pos.y && Mouse::pos.y >= UI::map.pos.y + UI::mapSize.y && Mouse::pos.x < UI::map.pos.x && Mouse::pos.x >= UI::map.pos.x + UI::mapSize.x)
 					{
 						// アイコンを捨てた
 					}
@@ -213,7 +260,7 @@ bool Game::editmap()
 		}
 	}
 
-	if (Mouse::pos.y >= field.grid.display.pos.y && Mouse::pos.y < field.grid.screenSize.y && Mouse::pos.x >= field.grid.display.pos.x && Mouse::pos.x < field.grid.screenSize.x)
+	if (Mouse::pos.y >= UI::map.pos.y && Mouse::pos.y < UI::map.pos.y + UI::mapSize.y && Mouse::pos.x >= UI::map.pos.x && Mouse::pos.x < UI::map.pos.x + UI::mapSize.x)
 	{
 		if (Mouse::b2())
 		{
