@@ -61,6 +61,7 @@ class Player :public Mob
 public:
 	void routine()override
 	{
+		// -++-
 		switch (Game::pop())
 		{
 		case 0:	// ç∂êUÇËå¸Ç´
@@ -69,7 +70,7 @@ public:
 				rot += 4;
 			break;
 		case 1:	// ëOêi
-			((rot % 2 == 0) ? pos.y : pos.x) += (rot / 2 == 0) ? -1 : 1;
+			((rot % 2 == 0) ? pos.y : pos.x) += ((rot + 1) % 4 / 2 == 0) ? -1 : 1;
 			break;
 		case 2:	// âEêUÇËå¸Ç´
 			rot += 1;
@@ -82,7 +83,7 @@ public:
 			((rot % 2 == 0) ? pos.x : pos.y) += (rot / 2 == 0) ? 1 : -1;
 			break;
 		case 7:	// å„ëﬁ
-			((rot % 2 == 0) ? pos.y : pos.x) += (rot / 2 == 0) ? 1 : -1;
+			((rot % 2 == 0) ? pos.y : pos.x) += ((rot + 1) % 4 / 2 == 0) ? 1 : -1;
 			break;
 		}
 	}
